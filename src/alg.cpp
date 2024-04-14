@@ -1,92 +1,97 @@
+#include <map>
 #include "tstack.h"
 
-bool isOperator(char op) {
-        return (op == '+' || op == '-' || op == '(' ||
-        op == ')' || op == '/' || op == '*');
-}
-bool isDigit(char n) {
-        return (n >= '0' && n <= '9');
-}
-
-int whatPrioritet(char op) {
-        if (op == '-' || op == '+')
-        return 1;
-    if (op == '/' || op == '*')
-        return 2;
-    return 0;
+int qqq(char x) {
+  switch (x) {
+    case '(':
+      return 0;
+    case ')':
+      return 1;
+    case '+': case '-':
+      return 2;
+    case '*': case '/':
+      return 3;
+    default:
+      return -1;
+    }
 }
 std::string infx2pstfx(std::string inf) {
-        std::string post;
-    int c = 0;
-    TStack <char, 100> stack1;
-    for (char s : inf) {
-        if (isDigit(s)) {
-            c++;
-            if (c == 1) {
-                post += s;
-                continue;
-            }
-            post = post + ' ' + s;
-        } else if (isOperator(s)) {
-            if (s == '(') {
-                stack1.push(s);
-            } else if (stack1.checkEmpty()) {
-                stack1.push(s);
-            } else if (whatPrioritet(s) > whatPrioritet(stack1.get())) {
-                stack1.push(s);
-            } else if (s == ')') {
-                while (stack1.get() != '(') {
-                    post = post + ' ' + stack1.get();
-                    stack1.pop();
-                }
-                stack1.pop();
-            } else {
-                int x = whatPrioritet(s);
-                int y = whatPrioritet(stack1.get());
-                while (!stack1.checkEmpty() && x <= y) {
-                    post = post + ' ' + stack1.get();
-                    stack1.pop();
-                }
-                stack1.push(s);
-            }
+          std::string rez, rez1;
+  TStack<char, 100>stack1;
+  for (auto& x : inf) {
+    int p = qqq(x);
+    if (p == -1) {
+      rez = rez + x + ' ';
+    } else {
+      char elem = stack1.get();
+      if (p == 0 || qqq(elem) < p || stack1.isEmpty()) {
+        stack1.push(x);
+      } else {
+        if (x == ')') {
+          while (qqq(elem) >= p) {
+            rez = rez + elem + ' ';
+            stack1.pop();
+            elem = stack1.get();
+          }
+          stack1.pop();
+        } else {
+          while (qqq(elem) >= p) {
+            rez = rez + elem + ' ';
+            stack1.pop();
+            elem = stack1.get();
+          }
+          stack1.push(x);
         }
+      }
     }
-    while (!stack1.checkEmpty()) {
-        post = post + ' ' + stack1.get();
-        stack1.pop();
-    }
-    return post;
+  }
+  while (!stack1.isEmpty()) {
+    rez = rez + stack1.get() + ' ';
+    stack1.pop();
+  }
+  for (int i = 0; i < rez.size() - 1; i++)
+    rez1 += rez[i];
+  return rez1;
+}
+
+int schet(const int& p, const int& v, const int& x) {
+  switch (x) {
+    case '+':
+      return p + v;
+    case '-':
+      return p - v;
+    case '/':
+      return p / v;
+    case '*':
+      return p * v;
+    default:
+      return 0;
+  }
 }
 
 int eval(std::string pref) {
-        TStack <int, 100> stack2;
-    for (char s : pref) {
-        if (isDigit(s)) {
-            stack2.push(s - '0');
-        } else if (isOperator(s)) {
-            int x = stack2.get();
-            stack2.pop();
-            int y = stack2.get();
-            stack2.pop();
-            switch (s) {
-            case '+':
-                stack2.push(x + y);
-                break;
-            case '-':
-                stack2.push(y - x);
-                break;
-            case '*':
-                stack2.push(x * y);
-                break;
-            case '/':
-                stack2.push(y / x);
-                break;
-            default:
-                continue;
-            }
-        } else {
-            continue;
-        }
+          TStack<int, 100> stack1;
+  std::string rez = "";
+  for (int i = 0; i < pref.size(); i++) {
+    char elem = pref[i];
+    if (qqq(elem) == -1) {
+      if (pref[i] == ' ') {
+        continue;
+      } else if (isdigit(pref[i+1])) {
+        rez += pref[i];
+        continue;
+      } else {
+        rez += pref[i];
+        stack1.push(atoi(rez.c_str()));
+        rez = "";
+      }
+    } else {
+      int v = stack1.get();
+      stack1.pop();
+      int p = stack1.get();
+      stack1.pop();
+      stack1.push(schet(p, v, elem));
     }
-    return stack2.get();
+  }
+  return stack1.get();
 }
