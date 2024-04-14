@@ -1,6 +1,4 @@
-// Copyright 2021 NNTU-CS
 #include <string>
-#include <map>
 #include "tstack.h"
 
 bool isOperator(char op) {
@@ -21,17 +19,17 @@ int whatPriority(char op) {
 }
 
 std::string infx2pstfx(std::string inf) {
-    std::string postfix;
+    std::string post;
     int counter = 0;
     TStack<char, 100> stack1;
-    for (char s : infix) {
+    for (char s : inf) {
         if (isDigit(s)) {
             counter++;
             if (counter == 1) {
-                postfix += s;
+                post += s;
                 continue;
             }
-            postfix = postfix + ' ' + s;
+            post = post + ' ' + s;
         } else if (isOperator(s)) {
             if (s == '(') {
                 stack1.push(s);
@@ -41,7 +39,7 @@ std::string infx2pstfx(std::string inf) {
                 stack1.push(s);
             } else if (s == ')') {
                 while (stack1.get() != '(') {
-                    postfix = postfix + ' ' + stack1.get();
+                    post = post + ' ' + stack1.get();
                     stack1.pop();
                 }
                 stack1.pop();
@@ -49,7 +47,7 @@ std::string infx2pstfx(std::string inf) {
                 int x = whatPriority(s);
                 int y = whatPriority(stack1.get());
                 while (!stack1.isEmpty() && x <= y) {
-                    postfix = postfix + ' ' + stack1.get();
+                    post = post + ' ' + stack1.get();
                     stack1.pop();
                 }
                 stack1.push(s);
@@ -57,15 +55,15 @@ std::string infx2pstfx(std::string inf) {
         }
     }
     while (!stack1.isEmpty()) {
-        postfix = postfix + ' ' + stack1.get();
+        post = post + ' ' + stack1.get();
         stack1.pop();
     }
-    return postfix;
+    return post;
 }
 
 int eval(std::string pref) {
     TStack<int, 100> stack2;
-    for (char s : prefix) {
+    for (char s : pref) {
         if (isDigit(s)) {
             stack2.push(s - '0');
         } else if (isOperator(s)) {
