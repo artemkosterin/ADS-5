@@ -1,41 +1,36 @@
 // Copyright 2021 NNTU-CS
-#include <iostream>
-#include <string>
 #ifndef INCLUDE_TSTACK_H_
 #define INCLUDE_TSTACK_H_
+#include <string>
 
 template<typename T, int size>
 class TStack {
  private:
-    T* ptr;
-    int x;
+    T arr[100];
+    int top;
+
  public:
-    TStack() : x(0) {
-        ptr = new T[size];
+    TStack(): top(-1) {}
+    void push(T value) {
+      if (!isFull())
+        arr[++top] = value;
+      else
+        throw std::string("Full");
     }
-    void pushup(const T& c) {
-        if (size - 1 >= x) {
-            ptr[x++] = c;
-        } else {
-            throw std::string("Fall !");
-        }
+    T get() const {
+      return arr[top];
     }
-    T popback() {
-        if (x > 0) {
-            return ptr[--x];
-        } else {
-            throw std::string("Empty");
-        }
+    T pop() {
+      if (isEmpty())
+        throw std::string("Empty");
+      else
+        return arr[top--];
     }
-    bool IfZero() const {
-        return x == 0;
+    bool isEmpty() const {
+      return top == -1;
     }
-    T ElemUp() const {
-        if (x > 0) {
-            return ptr[x - 1];
-        } else {
-            throw std::string("Fall!");
-        }
+    bool isFull() const {
+      return top == size - 1;
     }
 };
 
