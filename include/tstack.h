@@ -1,33 +1,41 @@
 // Copyright 2021 NNTU-CS
+#include <iostream>
+#include <string>
 #ifndef INCLUDE_TSTACK_H_
 #define INCLUDE_TSTACK_H_
-#include <string>
 
 template<typename T, int size>
 class TStack {
-  // добавьте код стека
  private:
-    T arr[100];
-    int top;
+    T* ptr;
+    int x;
  public:
-    TStack(): top(-1) {}
-    void pushh(T val) {
-      if (!isOverflow())
-        arr[++top] = val;
-      else
-        throw std::string("Stack overflow");
+    TStack() : x(0) {
+        ptr = new T[size];
     }
-    T popp() {
-      if (isEmptyy())
-        throw std::string("Stack is empty");
-      else
-        return arr[top--];
+    void pushup(const T& c) {
+        if (size - 1 >= x) {
+            ptr[x++] = c;
+        } else {
+            throw std::string("Fall !");
+        }
     }
-    bool isOverflow() const {
-      return top == size - 1;
+    T popback() {
+        if (x > 0) {
+            return ptr[--x];
+        } else {
+            throw std::string("Empty");
+        }
     }
-    bool isEmptyy() const {
-      return top == -1;
+    bool IfZero() const {
+        return x == 0;
+    }
+    T ElemUp() const {
+        if (x > 0) {
+            return ptr[x - 1];
+        } else {
+            throw std::string("Fall!");
+        }
     }
 };
 
