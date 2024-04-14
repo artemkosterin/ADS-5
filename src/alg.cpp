@@ -22,12 +22,12 @@ int whatPriority(char op) {
 
 std::string infx2pstfx(std::string inf) {
     std::string postfix;
-    int count = 0;
+    int counter = 0;
     TStack<char, 100> stack1;
     for (char s : infix) {
         if (isDigit(s)) {
-            count++;
-            if (count == 1) {
+            counter++;
+            if (counter == 1) {
                 postfix += s;
                 continue;
             }
