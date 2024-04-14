@@ -3,45 +3,26 @@
 
 template <typename T, int size>
 class TStack {
-private:
-    T *stackArray;
+  private:
+    T* stackArray;
     int topIndex;
-public:
-    TStack() {
-        stackArray = new T[size];
-        topIndex = -1;
+  public:
+    TStack() : topIndex(-1) {
+      stackArray = new T[size];
     }
-    
-    ~TStack() {
-        delete[] stackArray;
-    }
-    
-    void push(T value) {
-        if (topIndex < size - 1) {
-            topIndex++;
-            stackArray[topIndex] = value;
-        }
-    }
-    
     void pop() {
-        if (topIndex >= 0) {
-            topIndex--;
-        }
+      if (topIndex >= 0)
+        topIndex--;
     }
-    
-    T top() const {
-        if (topIndex >= 0) {
-            return stackArray[topIndex];
-        }
-        throw std::out_of_range("Stack is empty");
+    void push(T item) {
+      if (topIndex < size - 1)
+        stackArray[++topIndex] = item;
     }
-    
-    bool isEmpty() const {
-        return topIndex == -1;
+    T get() const {
+      return stackArray[topIndex];
     }
-    
-    bool isFull() const {
-        return topIndex == size - 1;
+    bool checkEmpty() const {
+      return topIndex == -1;
     }
 };
 
