@@ -1,127 +1,98 @@
 #include <string>
 #include <map>
 #include "tstack.h"
-int prioty(char);
-int schet(int, int, char);
-std::string infx2pstfx(std::string);
-int eval(std::string);
 
+int Priora(char x) {
+  switch (x) {
+    case '(':
+      return 0;
+    case ')':
+      return 1;
+    case '+': case '-':
+      return 2;
+    case '*': case '/':
+      return 3;
+    default:
+      return -1;
+    }
+}
 std::string infx2pstfx(std::string inf) {
-        TStack<char, 100> stack;
-    std::string line = "";
-    int flag = 0;
-    try {
-        for (char& n : inf) {
-            if ((n >= '0') && (n <= '9')) {
-                if (flag == 1) {
-                    line = line + " " + n;
-                    flag = 0;
-                } else {
-                    line = line + n;
-                }
-            } else {
-                if (n == '(') {
-                    stack.pushup(n);
-                } else {
-                    flag = 1;
-                    if (stack.IfZero()) {
-                        stack.pushup(n);
-                    } else {
-                        if (n == ')') {
-                            while (stack.ElemUp() != '(') {
-                                line = line + " " + stack.popback();
-                            }
-                            stack.popback();
-                        } else {
-                            if (prioty(n) > prioty(stack.ElemUp())) {
-                                stack.pushup(n);
-                            } else {
-                                while ((!stack.IfZero()) &&
-                                    (prioty(n) <= prioty(stack.ElemUp()))) {
-                                    line = line + " " + stack.popback();
-                                }
-                                stack.pushup(n);
-                            }
-                        }
-                    }
-                }
-            }
+          std::string rez, rez1;
+  TStack<char, 100>stack1;
+  for (auto& x : inf) {
+    int p = Priora(x);
+    if (p == -1) {
+      rez = rez + x + ' ';
+    } else {
+      char elem = stack1.get();
+      if (p == 0 || Priora(elem) < p || stack1.isEmpty()) {
+        stack1.push(x);
+      } else {
+        if (x == ')') {
+          while (Priora(elem) >= p) {
+            rez = rez + elem + ' ';
+            stack1.pop();
+            elem = stack1.get();
+          }
+          stack1.pop();
+        } else {
+          while (Priora(elem) >= p) {
+            rez = rez + elem + ' ';
+            stack1.pop();
+            elem = stack1.get();
+          }
+          stack1.push(x);
         }
-        while (!stack.IfZero()) {
-            line = line + " " + stack.popback();
-        }
-        return line;
+      }
     }
-    catch (std::string maliniya) {
-        return "Fall!";
-    }
+  }
+  while (!stack1.isEmpty()) {
+    rez = rez + stack1.get() + ' ';
+    stack1.pop();
+  }
+  for (int i = 0; i < rez.size() - 1; i++)
+    rez1 += rez[i];
+  return rez1;
+}
+
+int schet(const int& p, const int& v, const int& x) {
+  switch (x) {
+    case '+':
+      return p + v;
+    case '-':
+      return p - v;
+    case '/':
+      return p / v;
+    case '*':
+      return p * v;
+    default:
+      return 0;
+  }
 }
 
 int eval(std::string pref) {
-        std::string line = "";
-    TStack<int, 100> stack1;
-    int flag = 0;
-    try {
-        for (char& b : pref) {
-            if (flag == 0) {
-                if (('0' <= b) && (b <= '9')) {
-                    line += b;
-                } else {
-                    if (line == "") {
-                        int y = stack1.popback();
-                        int x = stack1.popback();
-                        int res = schet(x, y, b);
-                        stack1.pushup(res);
-                        flag = 1;
-                    } else {
-                        stack1.pushup(stoi(line));
-                        line = "";
-                    }
-                }
-            } else {
-                flag = 0;
-            }
-        }
-        return stack1.popback();
+          TStack<int, 100> stack1;
+  std::string rez = "";
+  for (int i = 0; i < pref.size(); i++) {
+    char elem = pref[i];
+    if (Priora(elem) == -1) {
+      if (pref[i] == ' ') {
+        continue;
+      } else if (isdigit(pref[i+1])) {
+        rez += pref[i];
+        continue;
+      } else {
+        rez += pref[i];
+        stack1.push(atoi(rez.c_str()));
+        rez = "";
+      }
+    } else {
+      int v = stack1.get();
+      stack1.pop();
+      int p = stack1.get();
+      stack1.pop();
+      stack1.push(schet(p, v, elem));
     }
-    catch (std::string maliniya) {
-        return -1;
-    }
-    return 0;
-}
-
-int prioty(char znak) {
-    int pryoto = 0;
-    switch (znak) {
-    case '+':
-        return 2;
-    case '-':
-        return 2;
-    case '(':
-        return 0;
-    case '*':
-        return 3;
-    case '/':
-        return 3;
-    case ')':
-        return 1;
-    default:
-        break;
-    }
-    return pryoto;
-}
-
-int schet(int x, int y, char znak) {
-    switch (znak) {
-    case '+':
-        return x + y;
-    case '-':
-        return x - y;
-    case '*':
-        return x * y;
-    case '/':
-        return x / y;
-    default:
-        return 0;
-    }
+  }
+  return stack1.get();
 }
