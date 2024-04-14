@@ -1,66 +1,72 @@
-#include <string>
-#include <stack>
+#include "tstack.h"
 
 bool isOperator(char op) {
-    return (op == '+' || op == '-' || op == '(' ||
+        return (op == '+' || op == '-' || op == '(' ||
         op == ')' || op == '/' || op == '*');
 }
-
 bool isDigit(char n) {
-    return (n >= '0' && n <= '9');
+        return (n >= '0' && n <= '9');
 }
 
-int whatPriority(char op) {
-    if (op == '-' || op == '+')
+int whatPrioritet(char op) {
+        if (op == '-' || op == '+')
         return 1;
     if (op == '/' || op == '*')
         return 2;
     return 0;
 }
-
 std::string infx2pstfx(std::string inf) {
-    std::string postfix;
-    std::stack<char> stack1;
+        std::string post;
+    int c = 0;
+    TStack <char, 100> stack1;
     for (char s : inf) {
         if (isDigit(s)) {
-            postfix += s;
-            continue;
+            c++;
+            if (c == 1) {
+                post += s;
+                continue;
+            }
+            post = post + ' ' + s;
         } else if (isOperator(s)) {
-            postfix += ' ';
             if (s == '(') {
                 stack1.push(s);
+            } else if (stack1.checkEmpty()) {
+                stack1.push(s);
+            } else if (whatPrioritet(s) > whatPrioritet(stack1.get())) {
+                stack1.push(s);
             } else if (s == ')') {
-                while (!stack1.empty() && stack1.top() != '(') {
-                    postfix += stack1.top();
+                while (stack1.get() != '(') {
+                    post = post + ' ' + stack1.get();
                     stack1.pop();
                 }
-                stack1.pop(); // Pop the '('
+                stack1.pop();
             } else {
-                while (!stack1.empty() && whatPriority(s) <= whatPriority(stack1.top())) {
-                    postfix += stack1.top();
+                int x = whatPrioritet(s);
+                int y = whatPrioritet(stack1.get());
+                while (!stack1.checkEmpty() && x <= y) {
+                    post = post + ' ' + stack1.get();
                     stack1.pop();
                 }
                 stack1.push(s);
             }
         }
     }
-    while (!stack1.empty()) {
-        postfix += ' ';
-        postfix += stack1.top();
+    while (!stack1.checkEmpty()) {
+        post = post + ' ' + stack1.get();
         stack1.pop();
     }
-    return postfix;
+    return post;
 }
 
-int eval(std::string post) {
-    std::stack<int> stack2;
-    for (char s : post) {
+int eval(std::string pref) {
+        TStack <int, 100> stack2;
+    for (char s : pref) {
         if (isDigit(s)) {
             stack2.push(s - '0');
         } else if (isOperator(s)) {
-            int x = stack2.top();
+            int x = stack2.get();
             stack2.pop();
-            int y = stack2.top();
+            int y = stack2.get();
             stack2.pop();
             switch (s) {
             case '+':
@@ -78,7 +84,9 @@ int eval(std::string post) {
             default:
                 continue;
             }
+        } else {
+            continue;
         }
     }
-    return stack2.top();
+    return stack2.get();
 }
