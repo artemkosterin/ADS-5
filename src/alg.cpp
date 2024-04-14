@@ -1,99 +1,96 @@
-#include <string>
-#include <stack>
 #include <map>
 #include "tstack.h"
 
-int Priora(char x) {
-  switch (x) {
+int prior(char sim) {
+    switch (sim) {
     case '(':
-      return 0;
+        return 0;
+        break;
     case ')':
-      return 1;
-    case '+': case '-':
-      return 2;
-    case '*': case '/':
-      return 3;
+        return 1;
+        break;
+    case '+':
+        return 2;
+        break;
+    case '-':
+        return 2;
+        break;
+    case '*':
+        return 3;
+        break;
+    case '/':
+        return 3;
+        break;
     default:
-      return -1;
+        return 0;
+        break;
     }
 }
 std::string infx2pstfx(std::string inf) {
-    std::string rez, rez1;
-  TStack<char, 100>stack1;
-  for (auto& x : inf) {
-    int p = Priora(x);
-    if (p == -1) {
-      rez = rez + x + ' ';
-    } else {
-      char elem = stack1.get();
-      if (p == 0 || Priora(elem) < p || stack1.isEmpty()) {
-        stack1.push(x);
-      } else {
-        if (x == ')') {
-          while (Priora(elem) >= p) {
-            rez = rez + elem + ' ';
-            stack1.pop();
-            elem = stack1.get();
-          }
-          stack1.pop();
-        } else {
-          while (Priora(elem) >= p) {
-            rez = rez + elem + ' ';
-            stack1.pop();
-            elem = stack1.get();
-          }
-          stack1.push(x);
+  // добавьте код
+  return std::string("");
+    TStack<char, 100> ownStack;
+    std::string res = "";
+    for (int i = 0; i < inf.size(); i++) {
+        if (isdigit(inf[i]) != 0) {
+            res += inf[i];
+        } else if (prior(inf[i]) == 2 || prior(inf[i]) == 3) {
+            res += " ";
+            if (ownStack.isEmpty() || prior(ownStack.get()) == 0 ||
+                prior(inf[i]) > prior(ownStack.get())) {
+                ownStack.push(inf[i]);
+            } else if (prior(inf[i]) <= prior(ownStack.get())) {
+                while (prior(inf[i]) <= prior(ownStack.get())) {
+                    res += ownStack.pop();
+                    res += " ";
+                }
+                ownStack.push(inf[i]);
+            }
+        } else if (prior(inf[i]) == 0) {
+            ownStack.push(inf[i]);
+        } else if (prior(inf[i]) == 1) {
+            while (prior(ownStack.get()) != 0) {
+                res += " ";
+                res += ownStack.pop();
+            }
+            ownStack.pop();
         }
-      }
     }
-  }
-  while (!stack1.isEmpty()) {
-    rez = rez + stack1.get() + ' ';
-    stack1.pop();
-  }
-  for (int i = 0; i < rez.size() - 1; i++)
-    rez1 += rez[i];
-  return rez1;
+    while (!ownStack.isEmpty()) {
+        res += " ";
+        res += ownStack.pop();
+    }
+    return std::string(res);
 }
-
-int schet(const int& p, const int& v, const int& x) {
-  switch (x) {
+int calculate(const int a, const int b, const char oper) {
+    switch (oper) {
     case '+':
-      return p + v;
+        return b + a;
     case '-':
-      return p - v;
-    case '/':
-      return p / v;
+        return b - a;
     case '*':
-      return p * v;
+        return a * b;
+    case '/':
+        return b / a;
     default:
-      return 0;
-  }
+        break;
+    }
+    return 0;
 }
 
 int eval(std::string pref) {
-    TStack<int, 100> stack1;
-  std::string rez = "";
-  for (int i = 0; i < pref.size(); i++) {
-    char elem = pref[i];
-    if (Priora(elem) == -1) {
-      if (pref[i] == ' ') {
-        continue;
-      } else if (isdigit(pref[i+1])) {
-        rez += pref[i];
-        continue;
-      } else {
-        rez += pref[i];
-        stack1.push(atoi(rez.c_str()));
-        rez = "";
-      }
-    } else {
-      int v = stack1.get();
-      stack1.pop();
-      int p = stack1.get();
-      stack1.pop();
-      stack1.push(schet(p, v, elem));
+  // добавьте код
+  return 0;
+    TStack<int, 100> opStack2;
+    for (int i = 0; i < pref.size(); i++) {
+        if (isdigit(pref[i]) != 0) {
+            int num = pref[i] - '0';
+            opStack2.push(num);
+        } else if (prior(pref[i]) == 2 || prior(pref[i]) == 3) {
+            int a = opStack2.pop();
+            int b = opStack2.pop();
+            opStack2.push(calculate(a, b, pref[i]));
+        }
     }
-  }
-  return stack1.get();
+    return opStack2.pop();
 }
