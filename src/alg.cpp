@@ -1,7 +1,9 @@
+#include <string>
+#include <stack>
 #include <map>
 #include "tstack.h"
 
-int qqq(char x) {
+int Priora(char x) {
   switch (x) {
     case '(':
       return 0;
@@ -16,26 +18,26 @@ int qqq(char x) {
     }
 }
 std::string infx2pstfx(std::string inf) {
-          std::string rez, rez1;
+    std::string rez, rez1;
   TStack<char, 100>stack1;
   for (auto& x : inf) {
-    int p = qqq(x);
+    int p = Priora(x);
     if (p == -1) {
       rez = rez + x + ' ';
     } else {
       char elem = stack1.get();
-      if (p == 0 || qqq(elem) < p || stack1.isEmpty()) {
+      if (p == 0 || Priora(elem) < p || stack1.isEmpty()) {
         stack1.push(x);
       } else {
         if (x == ')') {
-          while (qqq(elem) >= p) {
+          while (Priora(elem) >= p) {
             rez = rez + elem + ' ';
             stack1.pop();
             elem = stack1.get();
           }
           stack1.pop();
         } else {
-          while (qqq(elem) >= p) {
+          while (Priora(elem) >= p) {
             rez = rez + elem + ' ';
             stack1.pop();
             elem = stack1.get();
@@ -70,11 +72,11 @@ int schet(const int& p, const int& v, const int& x) {
 }
 
 int eval(std::string pref) {
-          TStack<int, 100> stack1;
+    TStack<int, 100> stack1;
   std::string rez = "";
   for (int i = 0; i < pref.size(); i++) {
     char elem = pref[i];
-    if (qqq(elem) == -1) {
+    if (Priora(elem) == -1) {
       if (pref[i] == ' ') {
         continue;
       } else if (isdigit(pref[i+1])) {
