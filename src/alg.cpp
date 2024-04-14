@@ -19,17 +19,17 @@ int whatPriority(char op) {
 }
 
 std::string infx2pstfx(std::string inf) {
-    std::string post;
+    std::string postfix;
     int counter = 0;
     TStack<char, 100> stack1;
     for (char s : inf) {
         if (isDigit(s)) {
             counter++;
             if (counter == 1) {
-                post += s;
+                postfix += s;
                 continue;
             }
-            post = post + ' ' + s;
+            postfix = postfix + ' ' + s;
         } else if (isOperator(s)) {
             if (s == '(') {
                 stack1.push(s);
@@ -39,7 +39,7 @@ std::string infx2pstfx(std::string inf) {
                 stack1.push(s);
             } else if (s == ')') {
                 while (stack1.get() != '(') {
-                    post = post + ' ' + stack1.get();
+                    postfix = postfix + ' ' + stack1.get();
                     stack1.pop();
                 }
                 stack1.pop();
@@ -47,7 +47,7 @@ std::string infx2pstfx(std::string inf) {
                 int x = whatPriority(s);
                 int y = whatPriority(stack1.get());
                 while (!stack1.isEmpty() && x <= y) {
-                    post = post + ' ' + stack1.get();
+                    postfix = postfix + ' ' + stack1.get();
                     stack1.pop();
                 }
                 stack1.push(s);
@@ -55,15 +55,15 @@ std::string infx2pstfx(std::string inf) {
         }
     }
     while (!stack1.isEmpty()) {
-        post = post + ' ' + stack1.get();
+        postfix = postfix + ' ' + stack1.get();
         stack1.pop();
     }
-    return post;
+    return postfix;
 }
 
-int eval(std::string pref) {
+int eval(std::string post) {
     TStack<int, 100> stack2;
-    for (char s : pref) {
+    for (char s : post) {
         if (isDigit(s)) {
             stack2.push(s - '0');
         } else if (isOperator(s)) {
