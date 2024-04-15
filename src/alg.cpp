@@ -1,98 +1,84 @@
 #include <string>
-#include <map>
-#include "tstack.h"
+#include <stack>
 
-int Priora(char x) {
-  switch (x) {
-    case '(':
-      return 0;
-    case ')':
-      return 1;
-    case '+': case '-':
-      return 2;
-    case '*': case '/':
-      return 3;
-    default:
-      return -1;
-    }
+bool isOperator(char op) {
+    return (op == '+' || op == '-' || op == '(' ||
+        op == ')' || op == '/' || op == '*');
 }
+
+bool isDigit(char n) {
+    return (n >= '0' && n <= '9');
+}
+
+int whatPriority(char op) {
+    if (op == '-' || op == '+')
+        return 1;
+    if (op == '/' || op == '*')
+        return 2;
+    return 0;
+}
+
 std::string infx2pstfx(std::string inf) {
-          std::string rez, rez1;
-  TStack<char, 100>stack1;
-  for (auto& x : inf) {
-    int p = Priora(x);
-    if (p == -1) {
-      rez = rez + x + ' ';
-    } else {
-      char elem = stack1.get();
-      if (p == 0 || Priora(elem) < p || stack1.isEmpty()) {
-        stack1.push(x);
-      } else {
-        if (x == ')') {
-          while (Priora(elem) >= p) {
-            rez = rez + elem + ' ';
-            stack1.pop();
-            elem = stack1.get();
-          }
-          stack1.pop();
-        } else {
-          while (Priora(elem) >= p) {
-            rez = rez + elem + ' ';
-            stack1.pop();
-            elem = stack1.get();
-          }
-          stack1.push(x);
+    std::string postfix;
+    std::stack<char> stack1;
+    for (char s : inf) {
+        if (isDigit(s)) {
+            postfix += s;
+            continue;
+        } else if (isOperator(s)) {
+            postfix += ' ';
+            if (s == '(') {
+                stack1.push(s);
+            } else if (s == ')') {
+                while (!stack1.empty() && stack1.top() != '(') {
+                    postfix += stack1.top();
+                    stack1.pop();
+                }
+                stack1.pop(); // Pop the '('
+            } else {
+                while (!stack1.empty() && whatPriority(s) <= whatPriority(stack1.top())) {
+                    postfix += stack1.top();
+                    stack1.pop();
+                }
+                stack1.push(s);
+            }
         }
-      }
     }
-  }
-  while (!stack1.isEmpty()) {
-    rez = rez + stack1.get() + ' ';
-    stack1.pop();
-  }
-  for (int i = 0; i < rez.size() - 1; i++)
-    rez1 += rez[i];
-  return rez1;
+    while (!stack1.empty()) {
+        postfix += ' ';
+        postfix += stack1.top();
+        stack1.pop();
+    }
+    return postfix;
 }
 
-int schet(const int& p, const int& v, const int& x) {
-  switch (x) {
-    case '+':
-      return p + v;
-    case '-':
-      return p - v;
-    case '/':
-      return p / v;
-    case '*':
-      return p * v;
-    default:
-      return 0;
-  }
-}
-
-int eval(std::string pref) {
-          TStack<int, 100> stack1;
-  std::string rez = "";
-  for (int i = 0; i < pref.size(); i++) {
-    char elem = pref[i];
-    if (Priora(elem) == -1) {
-      if (pref[i] == ' ') {
-        continue;
-      } else if (isdigit(pref[i+1])) {
-        rez += pref[i];
-        continue;
-      } else {
-        rez += pref[i];
-        stack1.push(atoi(rez.c_str()));
-        rez = "";
-      }
-    } else {
-      int v = stack1.get();
-      stack1.pop();
-      int p = stack1.get();
-      stack1.pop();
-      stack1.push(schet(p, v, elem));
+int eval(std::string post) {
+    std::stack<int> stack2;
+    for (char s : post) {
+        if (isDigit(s)) {
+            stack2.push(s - '0');
+        } else if (isOperator(s)) {
+            int x = stack2.top();
+            stack2.pop();
+            int y = stack2.top();
+            stack2.pop();
+            switch (s) {
+            case '+':
+                stack2.push(x + y);
+                break;
+            case '-':
+                stack2.push(y - x);
+                break;
+            case '*':
+                stack2.push(x * y);
+                break;
+            case '/':
+                stack2.push(y / x);
+                break;
+            default:
+                continue;
+            }
+        }
     }
-  }
-  return stack1.get();
+    return stack2.top();
 }
