@@ -53,6 +53,7 @@ std::string infx2pstfx(std::string inf) {
     rez1 += rez[i];
   return rez1;
 }
+
 int schet(const int& p, const int& v, const int& x) {
   switch (x) {
     case '+':
@@ -67,6 +68,7 @@ int schet(const int& p, const int& v, const int& x) {
       return 0;
   }
 }
+
 int eval(std::string pref) {
     TStack<int, 100> stack1;
   std::string rez = "";
